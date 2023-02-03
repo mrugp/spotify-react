@@ -19,7 +19,7 @@ function App() {
     useEffect(() => {
         const hash = window.location.hash
         let token = window.localStorage.getItem("token")
-        console.log("hash",hash,typeof window.location);
+        
       
 
         if (!token && hash) {
@@ -40,9 +40,9 @@ function App() {
 
     const searchArtists = async (e) => {
 
-        console.log("in documntd")
+       
         e.preventDefault()
-        const response = await fetch("https://api.spotify.com/v1/search", {
+        const {data} = await fetch("https://api.spotify.com/v1/search", {
             headers: {
                 Authorization: `Bearer ${token}`
             },
@@ -51,8 +51,8 @@ function App() {
                 type: "artist"
             }
         })
-        console.log("data in fn",response)
-          const {data } = response
+       
+         
         setArtists(data.artists.items)
     }
 
