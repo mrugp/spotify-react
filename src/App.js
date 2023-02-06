@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
 import './App.css';
 import React from 'react';
-//import axios from 'axios';
+
 import { FormControl, Navbar } from 'react-bootstrap'
 import { response } from "msw";
+
 
 function App() {
     const CLIENT_ID = "bd0224386916428a95c13b5f72e84be2"
@@ -42,18 +43,32 @@ function App() {
 
        
         e.preventDefault()
-        const {data} = await fetch("https://api.spotify.com/v1/search", {
+        
+        var url = new URL('https://api.spotify.com/v1/search')
+        var params= {
+            q: searchKey,
+            type: "artist"
+        }
+       
+        
+        url.search = new URLSearchParams(params).toString();
+        
+        await fetch(url,{
+            method:'GET',
+            mode:'cors',
             headers: {
-                Authorization: `Bearer ${token}`
-            },
-            params: {
-                q: searchKey,
-                type: "artist"
-            }
-        })
+                        'Authorization': `Bearer ${token}`,
+                        'Content-type': 'application/json; charset=UTF-8'
+                    },
+
+        }).then(response => {  
+            console.log("response in fetch",response);
+           return response.json()})
+        .then(response => setArtists(response.artists.items))
+        //.then(response => response.json())
+
        
          
-        setArtists(data.artists.items)
     }
 
     const renderArtists = () => {
@@ -73,7 +88,7 @@ function App() {
                 {!token ?
                     <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login
                         to Spotify</a>
-                    : <button onClick={logout}>Logout</button>}
+                    : <></>}
 
                 {token ?
                     
@@ -86,9 +101,11 @@ function App() {
               <input type="text" id="search"class="form-control" placeholder="Search for your favourite song or artist..."  onChange={(event) => setSearchKey(event.target.value)} />
               <div class="input-group-append">
                 <button id='searchButton' type="button" class="btn btn-secondary" onClick={searchArtists}><i class="fa fa-search"></i></button>
+                
               </div>
             </div>
           </form>
+          <button class="btn btn-secondary" style={{marginTop:'2%'}}onClick={logout}>Logout</button>
                        </>
                     : <h2>Please login</h2>
                 }
